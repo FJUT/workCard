@@ -1,0 +1,77 @@
+html, body {width:100%;height:100%;}
+html, body {width:100%;height:100%;}
+
+body {
+  font: 14px 'microsoft yahei', "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+  font-family: 'NexaLight';
+  src: url('fonts/NexaLight.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.list {float:left;width:307px;}
+
+#content {position: absolute;left:50%; top:50%;margin-top: -250px;margin-left: -275px;width:614px;}
+
+#workCard {background: url('../img/work-card.jpg') left top no-repeat;padding: 48px 16px 17px 17px;height:435px;width:274px;box-sizing:content-box;}
+
+.camera {width:100%;height:250px;font-size: 200px;text-align: center;display: block;color:#aaa;}
+.camera:hover {color:#3eb0ff;}
+.camera span {cursor:pointer;}
+
+.saveBtn {width:100%;}
+
+#workbench {padding: 10px 20px;}
+
+#workCard .wrap {position: relative;width:100%;height:100%;}
+#workCard .wrap .logo, #workCard .wrap .meta {position: absolute;width:100%;}
+
+#workCard .wrap .logo {left:0;top:0;background: url('../img/logo.png') left top no-repeat;height:60px;}
+#workCard .wrap .meta {bottom:0;left:0;height:60px;background: rgba(22,22,22,0.7);}
+#workCard .wrap .pic {width:100%;height:100%;background: #eee url('../img/teacher.jpg') center center no-repeat;overflow: hidden; }
+#workCard .wrap .meta>div {position: absolute;color:#fff;font-size: 18px;}
+
+#department{font-family:"黑体";left:160px;top:20px;padding-left: 5px;border-left: 5px solid #fff;}
+.ceo-office {color: rgb(255, 255, 255) !important;border-color: rgb(255, 255, 255) !important;}
+.hr {color: rgb(98, 139, 255) !important;border-color: rgb(98, 139, 255) !important;}
+.executive {color: rgb(255, 88, 131) !important;border-color: rgb(255, 88, 131) !important;}
+.finance {color: rgb(255, 240, 0) !important;border-color: rgb(255, 240, 0) !important;}
+.marketing {color: rgb(90, 255, 0) !important;border-color: rgb(90, 255, 0) !important;}
+.test {color: rgb(238, 34, 20) !important;border-color: rgb(238, 34, 20) !important;}
+.web {color: rgb(35, 227, 255) !important;border-color: rgb(35, 227, 255) !important;}
+.painting {color: rgb(217, 49, 199) !important;border-color: rgb(217, 49, 199) !important;}
+.plan {color: rgb(255, 129, 53) !important;border-color: rgb(255, 129, 53) !important;}
+.programme {color: rgb(50, 160, 252) !important;border-color: rgb(50, 160, 252) !important;}
+
+#enName{left:40px;top:8px;font-family: 'NexaLight';}
+#zhName{font-family:"黑体";left:40px;top:35px;}
+
+#workbench .tool {display: none;width:100%;height:100%;background: #eee;z-index: 10;position: relative;}
+#workbench .imgArea img {height:100%;}
+#workbench .imgArea {text-align: center;background: #eee;}
+.imgBox {height:270px;margin-bottom: 20px;position: relative;}
+.preview-container {height:100%;width:100%;}
+
+#workbench .imgBox .loading {width:100%;height:100%;background: #eee url('../img/loading.gif') center 90px no-repeat;}
+#workbench .imgBox .errorPanel {background: #fff url('../img/img-error.jpg') center 50px no-repeat;}
+.imgBox .loadingText {display: block;padding: 150px 20px 0 20px;text-align: center;}
+.imgBox .reUpload {cursor: pointer;}
+.reUpload.main {position: absolute;top:0;right:35px;font-size:30px;z-index: 1;}
+
+#uploadContent {position: absolute;top:0;left:0;width:100%;height:100%;z-index: 10;}
+
+#progressWrap {width:650px;height:200px;position: fixed;left:50%;top:50%;margin-left: -305px;margin-top: -100px;background: #fff;z-index: 100;display: none;}
+#progressWrap .box {width:80%;margin:20px auto;}
+#progressMsg {font-size: 25px; padding: 30px; text-align: center; }
+
+#mask {position: fixed;width:100%;height:100%;background: rgba(0,0,0,0.5);z-index: 50;left:0;top:0;display: none;}
+#combinImg {display: none;position: fixed;width:650px;height:650px;background: #fff;z-index: 150;left:50%;top:50%;margin-left:-305px;margin-top:-325px;text-align: center;}
+#combinImg img {width:346px;height:550px;margin: 20px auto;}
+#combinImg .btn {margin:0 10px;}

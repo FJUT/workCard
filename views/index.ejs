@@ -1,0 +1,105 @@
+<% include header %>
+	
+	<div id="content">
+	  	<div class="list" id="workCard">
+	  		<div class="wrap">
+	  			<div class="pic" id="preview-pane">
+	  				<div class="preview-container">
+		  				<img src="/img/teacher.jpg" alt="" class="jcrop-preview">
+	  				</div>
+	  			</div>
+	  			<div class="logo"></div>
+	  			<div class="meta">
+	  				<div id="department" class="ceo-office">总裁办</div>
+	  				<div id="enName">Aoi sola</div>
+	  				<div id="zhName">苍井空</div>
+	  			</div>
+	  		</div>
+	  	</div>
+	  	<div class="list" id="workbench">
+	  		<div class="imgBox thumbnail" id="uploadBox">
+	  			<div style="display:block;" class="camera tool" id="upload">
+	  				<a class="" title="点击上传头像">
+			  			<span class="glyphicon glyphicon-camera"></span>
+			  		</a>
+	  			</div>
+		  		<div class="imgArea tool">
+		  			<img src="/img/test-person.jpg" alt="" id="target">
+		  		</div>
+		  		<div class="loading tool">
+		  			<span class="loadingText">正在努力上传中...<a class="reUpload">重新上传</a></span>
+		  		</div>
+		  		<div class="errorPanel tool">
+		  			<span class="loadingText"><b>上传失败</b><a class="reUpload">重新上传</a></span>
+		  		</div>
+		  		<a title="重新上传" class="reUpload main">
+		  			<span class="glyphicon glyphicon-remove-circle"></span>
+		  		</a>
+	  		</div>
+	  		<div id="workForm">
+	  			<form class="form-horizontal" role="form">
+				  <div class="form-group">
+				    <label for="inputEnName" class="col-sm-4 control-label">英文名</label>
+				    <div class="col-sm-8">
+				      <input type="text" class="form-control" id="inputEnName" placeholder="Aoi sola" data-target="enName">
+				    </div>
+				  </div>
+					<div class="form-group">
+					    <label for="inputZhName" class="col-sm-4 control-label">中文名</label>
+					    <div class="col-sm-8">
+					      <input type="text" class="form-control" id="inputZhName" placeholder="苍井空" data-target="zhName">
+					    </div>
+					  </div>
+					  <div class="form-group">
+					    <label for="inputDepartment" class="col-sm-4 control-label">部门</label>
+					    <div class="col-sm-8">
+					      <select class="form-control"  data-target="department" id="inputDepartment">
+							  <option selected data-color="ceo-office">总裁办</option>
+							  <option data-color="hr">HR</option>
+							  <option data-color="executive">行政部</option>
+							  <option data-color="finance">财务部</option>
+							  <option data-color="marketing">市场部</option>
+							  <option data-color="test">测试部</option>
+							  <option data-color="web">后台组</option>
+							  <option data-color="painting">美术</option>
+							  <option data-color="plan">策划</option>
+							  <option data-color="programme">程序</option>
+							</select>
+					    </div>
+					  </div>
+				  <div class="form-group">
+				    <div class="col-sm-12">
+				      <button id="saveBtn" type="submit" disabled="true" class="btn btn-primary btn-lg saveBtn">提 交</button>
+				    </div>
+				  </div>
+				</form>
+	  		</div>
+	  	</div>
+	</div>
+	
+	<div id="progressWrap">
+		<div class="box">
+			<div id="progressMsg">正在计算图片信息...</div>
+			<div class="progress">
+			  <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
+			    <span class="sr-only">45% Complete</span>
+			  </div>
+			</div>
+		</div>
+		
+	</div>
+
+	<div id="combinImg">
+		<img src="" alt="">
+		<div class="btnWrap">
+			<button type="button" class="btn btn-success complete"><span class="glyphicon glyphicon-floppy-saved"></span> 标记完成</button>
+			<a class="btn btn-primary viewImg" href="" target="_blank"><span class="glyphicon glyphicon-new-window"></span> 查看大图</a>
+			<button type="button" class="btn btn-warning redo"><span class="glyphicon glyphicon-trash"></span> 取消重做</button>
+		</div>
+	</div>
+
+	<div id="mask">
+		
+	</div>
+
+<% include footer %>
