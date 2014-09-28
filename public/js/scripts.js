@@ -22,59 +22,28 @@ $(function(){
     var progressStatusHolder = $("#progressMsg");
     var progressBar = progressWrap.find(".progress-bar");
     var combinImg = $("#combinImg");
+    var uploadIpt = $("#uploadIpt");
+    var allowImgType = {
+        jpeg: 'allow',
+        jpg: 'allow',
+        png: 'allow'
+    };
 
-    var uploader = Qiniu.uploader({
-        runtimes: 'html5,flash,html4',
-        browse_button: 'upload',
-        container: 'uploadBox',
-        drop_element: 'uploadBox',
-        max_file_size: '5mb',
-        flash_swf_url: '../../components/plupload/js/Moxie.swf',
-        dragdrop: true,
-        multi_selection: false,
-        //unique_names: true,
-        //save_key: true,
-        chunk_size: '4mb',
-        uptoken_url: '/api/uptoken',
-        domain: 'http://qifunoa.qiniudn.com/',
-        auto_start: true,
-        init: {
-            'FilesAdded': function(up, files) {
-                showLoading();
-            },
-            'BeforeUpload': function(up, file) {
-            },
-            'UploadProgress': function(up, file) {
-            },
-            'UploadComplete': function() {
-            },
-            'FileUploaded': function(up, file, info) {
-                var domain = up.getOption('domain');
-                var res = $.parseJSON(info);
-                var sourceLink = domain + res.key;
-                //sourceLink = sourceLink+"?imageView2/1/w/280/h/140";
-                loadImg(sourceLink);
-            },
-            'Error': function(up, err, errTip) {
-                console.log(errTip);
-                if (err.status==403){
-                    return showError("文件类型不符合！");
-                }
-                if (errTip){
-                    showError(errTip);
-                }
-            },
-            'Key': function(up, file) {
-                var fileName = file.name;
-                var size = file.size;
-                var newName = fileName.replace(/\.([a-zA-Z]+)$/gi, function($$){
-                    return '_'+file.size+$$;
-                });
-                return newName;
-                //return '';
-            }
+    uploadIpt.bind('change', checkImgType);
+
+    function checkImgType(e){
+        var file = this.files[0];
+        var type = file.type.split('/');
+        var size = file.size;
+        if (type[0]!='image' || !allowImgType[type[1]]){
+            return  showError("图片格式不正确！(仅支持jpg/png)");
         }
-    });
+        if (size> 5*1024*1024){
+            return  showError("图片大小不能超过5M！");
+        }
+        var url = window.URL.createObjectURL(file);
+        loadImg(url);
+    }
 
     function loadImg(url){
         showLoading();
@@ -233,64 +202,39 @@ $(function(){
 
     function submitForm(e){
         e.preventDefault();
-        var postData = {
-            cropImg: originImgUrl+getCropInfo(),
-            enname: $("#inputEnName").val(),
-            zhname: $("#inputZhName").val(),
-            department: $("#inputDepartment").val(),
-        };
+        var file =  uploadIpt[0].files[0];
 
+        //submit to server
+          var formData = new FormData();
+          formData.append('zhname', $("#inputZhName").val());
+          formData.append('enname', $("#inputEnName").val());
+          formData.append('department', $("#inputDepartment").val());
+          formData.append(file.name, file);
+          //formData.append('fileName', fileName);
 
-        var filePart = originImgUrl.split('/');
-        var fileName = filePart[filePart.length-1];
+          var postServerXhr = new XMLHttpRequest();
+          postServerXhr.open('POST', '/api/upload', true);
+          postServerXhr.onload = function(e) {
 
-        var getQinXhr = new XMLHttpRequest();
-        getQinXhr.open('GET', postData.cropImg, true);
-        getQinXhr.responseType = 'blob';
+            var url = JSON.parse(this.response).imagePath;
 
-        showProgress('正在计算人像图片', '40%');
+            showProgress('正在加载合生图片', '90%');
+            var combinImg = new Image();
+            combinImg.onload = function(){
+                showProgress('工牌制作完成', '100%');
+                setTimeout(function(){
+                    showCombinImg(url);
+                }, 500);
+            };
+            combinImg.src = url;
+          };
 
-        getQinXhr.onload = function(e) {
-          if (this.status == 200) {
-            
-            //submit to server
-              var formData = new FormData();
-              formData.append('name', postData.zhname);
-              formData.append('ename', postData.enname);
-              formData.append('department', postData.department);
-              formData.append('file', this.response);
-              formData.append('fileName', fileName);
+          postServerXhr.send(formData);
 
-              var postServerXhr = new XMLHttpRequest();
-              postServerXhr.open('POST', 'upload.do', true);
-              //postServerXhr.open('POST', '/pic/upload.do', true);
-              postServerXhr.onload = function(e) { 
+          showProgress('正在合生工作牌', '70%');
 
-                var url = JSON.parse(this.response).imagePath;
-
-                showProgress('正在加载合生图片', '90%');
-                var combinImg = new Image();
-                combinImg.onload = function(){
-                    showProgress('工牌制作完成', '100%');
-                    setTimeout(function(){
-                        showCombinImg(url);
-                    }, 500);
-                };
-                combinImg.src = url;
-              };
-
-              postServerXhr.send(formData);
-
-              showProgress('正在合生工作牌', '70%');
-
-          }
-        };
-
-        getQinXhr.send();
-        
     }
 
-        
     function showCombinImg(url){
         progressWrap.hide();
         combinImg.children('img')[0].src=url;
@@ -312,7 +256,6 @@ $(function(){
     combinImg.find('.complete').bind('click', completeMake);
 
     combinImg.find('.redo').bind('click', reMark);
-
 
     saveBtn.bind('click', submitForm);
 

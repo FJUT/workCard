@@ -6,6 +6,7 @@ var gm = require('gm');
 var spawn = require('child_process').spawn;
 var imgFolder = '../public/upload/';
 
+
 function combineImg(src, filename, cb){
     src="C:\\Users\\user\\AppData\\Local\\Temp\\7956-tdh8jm.jpg";
     filename = 'dest.jpg';
@@ -35,41 +36,34 @@ function combineImg(src, filename, cb){
     });
 }
 
-/* GET home page. */
-router.get('/', function(req, res) {
-  res.render('index', { title: 'Express' });
-});
 
-/**
- * save or edit pic
- */
-router.post('/api/upload', multipartMiddleware, function(req, res, next) {
-    console.log(req.body, req.files[0]);
-    var resMsg = {
-        stauts: "ok",
-        msg: "上传成功",
-        data: ""
-    };
-    var zhname = req.body.zhname;
-    var enname = req.body.enname;
-    var department = req.body.department;
-    var files = req.files;
-    if (!zhname || !enname || !department || !files){
-        resMsg.stauts = "error";
-        resMsg.msg = "上传信息不全！";
-        return res.json(resMsg);
-    }
+function combineImg2(){
 
-    return combineImg2();
+    var composite = spawn('gm',
+        [
+            'composite',
+            '-gravity',
+            'SouthEast', //右下角
+            '-dissolve',
+            '80', //溶解度,和透明度类似
+            '/source/logo.png',
+            '/source/mm.jpg',
+            '/source/dest.jpg'
+        ]);
 
-    for(var filename in files){
-        var file = files[filename]
-        return combineImg(file.path, filename, function(src){
-            resMsg.data = src;
-            return res.json(resMsg);
-        })
-    }
+    composite.stdout.on('data',function(data){
+        console.log(data);
+    });
 
-});
+    composite.stderr.on('data',function(data){
+        console.log(data);
+    });
 
-module.exports = router;
+    composite.on('exit',function(code){
+        if(code != 0){
+            console.log('gm composite process exited with code ' + code);
+        }
+    });
+}
+
+combineImg();

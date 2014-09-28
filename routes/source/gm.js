@@ -1,6 +1,6 @@
-var fs = require('fs');
-var gm = require('gm');
-var teacher = 'mm.jpg';
+//var fs = require('fs');
+//var gm = require('gm');
+var teacher = 'C:\\Users\\user\\AppData\\Local\\Temp\\7956-tdh8jm.jpg';
 var logo = 'logo.png';
 var dest = "dest.jpg";
 
