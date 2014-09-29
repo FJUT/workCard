@@ -193,7 +193,7 @@ $(function(){
 
     function getCropInfo(){
         var info = jcrop_api.tellSelect();
-        var bigImg = previewPane.find('img')
+        var bigImg = previewPane.find('img');
         var thumbnailVal = bigImg.width()/originWidth;
         var offsetLeft = Math.abs(parseInt(bigImg.css('margin-left')))*2;
         var offsetTop = Math.abs(parseInt(bigImg.css('margin-top')))*2;
@@ -203,12 +203,17 @@ $(function(){
     function submitForm(e){
         e.preventDefault();
         var file =  uploadIpt[0].files[0];
+        var bigImg = previewPane.find('img');
+        var offsetLeft = Math.abs(parseInt(bigImg.css('margin-left')))*2;
+        var offsetTop = Math.abs(parseInt(bigImg.css('margin-top')))*2;
 
         //submit to server
           var formData = new FormData();
           formData.append('zhname', $("#inputZhName").val());
           formData.append('enname', $("#inputEnName").val());
           formData.append('department', $("#inputDepartment").val());
+          formData.append('imgSize', bigImg.width()*2 + 'x' + bigImg.height()*2);
+          formData.append('imgCrop', minTargetWidth*2+'x'+minTargetHeight*2+'+'+offsetLeft+'+'+offsetTop);
           formData.append(file.name, file);
           //formData.append('fileName', fileName);
 
