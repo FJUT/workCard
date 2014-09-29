@@ -2,13 +2,11 @@ var express = require('express');
 var router = express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
-var gm = require('gm');
+//var gm = require('gm');
 var spawn = require('child_process').spawn;
-var imgFolder = '../public/upload/';
+var imgFolder = 'public/upload/';
 
 function combineImg(src, filename, cb){
-    src="C:\\Users\\user\\AppData\\Local\\Temp\\7956-tdh8jm.jpg";
-    filename = 'dest.jpg';
     var crop = spawn('convert', [
         '-density',
         '300x300', //定义DPI
@@ -24,15 +22,19 @@ function combineImg(src, filename, cb){
         imgFolder+filename
     ]);
 
+    crop.on('error', function (err) {
+        console.log('gm crop error', err);
+    });
+
     crop.on('exit',function(code) {
         if (code != 0) {
             console.log('gm crop process exited with code ' + code);
         } else {
-            console.log('ok');
             var imgSrc = '/upload/'+filename;
             if (cb) cb(imgSrc);
         }
     });
+
 }
 
 /* GET home page. */
@@ -44,7 +46,6 @@ router.get('/', function(req, res) {
  * save or edit pic
  */
 router.post('/api/upload', multipartMiddleware, function(req, res, next) {
-    console.log(req.body, req.files[0]);
     var resMsg = {
         stauts: "ok",
         msg: "上传成功",
@@ -59,8 +60,6 @@ router.post('/api/upload', multipartMiddleware, function(req, res, next) {
         resMsg.msg = "上传信息不全！";
         return res.json(resMsg);
     }
-
-    return combineImg2();
 
     for(var filename in files){
         var file = files[filename]

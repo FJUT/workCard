@@ -216,7 +216,7 @@ $(function(){
           postServerXhr.open('POST', '/api/upload', true);
           postServerXhr.onload = function(e) {
 
-            var url = JSON.parse(this.response).imagePath;
+            var url = JSON.parse(this.response).data;
 
             showProgress('正在加载合生图片', '90%');
             var combinImg = new Image();

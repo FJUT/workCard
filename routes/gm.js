@@ -39,30 +39,22 @@ function combineImg(src, filename, cb){
 
 function combineImg2(){
 
-    var composite = spawn('gm',
-        [
-            'composite',
-            '-gravity',
-            'SouthEast', //右下角
-            '-dissolve',
-            '80', //溶解度,和透明度类似
-            '/source/logo.png',
-            '/source/mm.jpg',
-            '/source/dest.jpg'
-        ]);
+    var ls = spawn('tasklist');
 
-    composite.stdout.on('data',function(data){
-        console.log(data);
+    ls.on('error', function (err) {
+        console.log('ls error', err);
     });
 
-    composite.stderr.on('data',function(data){
-        console.log(data);
+    ls.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
     });
 
-    composite.on('exit',function(code){
-        if(code != 0){
-            console.log('gm composite process exited with code ' + code);
-        }
+    ls.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+
+    ls.on('close', function (code) {
+        console.log('child process exited with code ' + code);
     });
 }
 
