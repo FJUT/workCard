@@ -1,295 +1,289 @@
-$(function(){
+$(function () {
     var workbench = $("#workbench");
     var camera = workbench.find('.camera');
-    var imgArea = workbench.find('.imgArea');
     var loading = workbench.find('.loading');
     var errorPanel = workbench.find('.errorPanel');
     var tools = workbench.find('.tool');
     var reloadBtn = workbench.find('a.reUpload');
-    var imgAreaRatio = imgArea.width()/imgArea.height();
-    var previewPane = $("#preview-pane");
+
+    var selFile = {};      //所选文件信息
+
+    //截图操作区域信息
+    var holderPane = workbench.find('.imgArea');
+    var holderWidth =  holderPane.width();
+    var holderHeight =  holderPane.height();
+    var holderRatio = holderWidth/holderHeight;
+
+    //预览视窗信息
+    var previewPane = $("#preview-pane");      //预览面板
+    var previewImg = previewPane.find('img');
+    var previewWidth = previewPane.width();
+    var previewHeight = previewPane.height();
+    var previewRatio = previewWidth / previewHeight; //预览面板长宽比例
+
+    //表单元素
     var reUploadMain = workbench.find("a.reUpload.main");
     var workForm = $('#workForm');
     var saveBtn = $("#saveBtn");
     var jcrop_api;
-    var minTargetWidth = previewPane.width();
-    var minTargetHeight = previewPane.height();
-    var originWidth, originHeight;
-    var originImgUrl;
-    var canvasWrap = $('#workCard .wrap');
     var mask = $("#mask");
     var progressWrap = $("#progressWrap");
     var progressStatusHolder = $("#progressMsg");
     var progressBar = progressWrap.find(".progress-bar");
-    var combinImg = $("#combinImg");
+    var combineImg = $("#combinImg");
     var uploadIpt = $("#uploadIpt");
+
+    //图片参数信息
     var allowImgType = {
         jpeg: 'allow',
         jpg: 'allow',
         png: 'allow'
     };
+    var maxSize = 5 * 1024 * 1024;
+    var combineRatio = 2;   //真实合成图与预览面板大小比例
 
-    uploadIpt.bind('change', checkImgType);
+    function getHolderImg(){
+        return holderPane.children('img');
+    }
 
-    function checkImgType(e){
+    function checkSelImg() {
         var file = this.files[0];
         var type = file.type.split('/');
         var size = file.size;
-        if (type[0]!='image' || !allowImgType[type[1]]){
+        if (type[0] != 'image' || !allowImgType[type[1]]) {
             return  showError("图片格式不正确！(仅支持jpg/png)");
         }
-        if (size> 5*1024*1024){
+        if (size > maxSize) {
             return  showError("图片大小不能超过5M！");
         }
+        selFile.file = file;
         var url = window.URL.createObjectURL(file);
-        loadImg(url);
+        readyCrop(url);
     }
 
-    function loadImg(url){
-        showLoading();
-        var imgHolder = imgArea.find("img")[0];
-        var bigImgHolder = previewPane.find('img')[0];
+    function readyCrop(url) {
         var img = new Image();
-        img.onload = function(){
-            originWidth = img.width;
-            originHeight = img.height;
-            if(img.width/img.height>imgAreaRatio){
-                $(imgHolder).css({
+        var holderImg = getHolderImg();
+        img.onload = function () {
+            selFile.width = img.width;
+            selFile.height = img.height;
+            if (img.width / img.height > holderRatio) {
+                holderImg.css({
                     width: '100%',
                     height: 'auto'
                 });
-            }else{
-                $(imgHolder).css({
+            } else {
+                holderImg.css({
                     height: '100%',
                     width: 'auto'
                 });
             }
-            imgHolder.src = url;
-            bigImgHolder.src = url;
-            originImgUrl = url;
+            holderImg[0].src = url;
+            previewImg[0].src = url;
+            selFile.url = url;
             showImg();
-            if (jcrop_api){
+            if (jcrop_api) {
                 jcrop_api.destroy();
                 jcrop_api = null;
             }
-            initJcrop();
-            checkSubmt();
+            setTimeout(function(){
+                initJcrop();
+            },0);
+            checkSubmit();
         };
-        img.onerror = function(){
+        img.onerror = function () {
             showError();
         }
         img.src = url;
     }
 
-    function remove(url){
-        thumbUpload.children('li').hide();
-        addWrap.show();
-        $scope.post.thumb = thumbDefault;
-    }
+    function initJcrop() {
 
-    function showProgress(msg, percent, cb){
-        mask.show();
-        progressWrap.show();
-        progressStatusHolder.text(msg);
-        progressBar.css('width', percent);
-        if (cb){
-            cb();
-        }
-    }
-
-    function initJcrop(){
-        // Create variables (in this scope) to hold the API and image size
-        var boundx,
-            boundy,
-        
-        // Grab some information about the preview pane
-        $preview = $('#preview-pane'),
-        $pcnt = $('#preview-pane .preview-container'),
-        $pimg = $('#preview-pane .preview-container img'),
-        
-        xsize = $pcnt.width(),
-        ysize = $pcnt.height();
-        
-        console.log('init',[xsize,ysize]);
+        var boundx, boundy;
 
         $('#target').Jcrop({
             onChange: updatePreview,
             onSelect: updatePreview,
-            aspectRatio: xsize / ysize
-        },function(){
-            // Use the API to get the real image size
+            aspectRatio: previewRatio
+        }, function () {
             var bounds = this.getBounds();
             boundx = bounds[0];
             boundy = bounds[1];
-            // Store the API in the jcrop_api variable
             jcrop_api = this;
+            holderToCenter();
             jcrop_api.animateTo([50, 50, 200, 200]);
-            
-            // Move the preview into the jcrop container for css positioning
-            //$preview.appendTo(jcrop_api.ui.holder);
         });
-        
-        function updatePreview(c){
+
+        function updatePreview(c) {
             if (parseInt(c.w) > 0) {
-                var rx = xsize / c.w;
-                var ry = ysize / c.h;
-                
-                $pimg.css({
+                var rx = previewWidth / c.w;
+                var ry = previewHeight / c.h;
+
+                previewImg.css({
                     width: Math.round(rx * boundx) + 'px',
                     height: Math.round(ry * boundy) + 'px',
                     marginLeft: '-' + Math.round(rx * c.x) + 'px',
                     marginTop: '-' + Math.round(ry * c.y) + 'px'
                 });
             }
-        };
-    } 
-
-    function showLoading(){
-        tools.hide();
-        loading.show();
+        }
     }
 
-    function reUpload(){
+    function holderToCenter(){
+        var jcropHolder = $(".jcrop-holder");
+        var jcropHolderWidth = jcropHolder.width();
+        var jcropHolderHeight = jcropHolder.height();
+        if (jcropHolderWidth<holderWidth){
+            jcropHolder.css({
+                'left': (holderWidth- jcropHolderWidth)/2
+            });
+        }
+        if (jcropHolderHeight<holderHeight){
+            jcropHolder.css({
+                'top': (holderHeight- jcropHolderHeight)/2
+            });
+        }
+    }
+
+    function showProgress(msg, percent, cb) {
+        mask.show();
+        progressWrap.show();
+        progressStatusHolder.text(msg);
+        progressBar.css('width', percent);
+        if (cb) {
+            cb();
+        }
+    }
+
+    function showUpload() {
         tools.hide();
         camera.show();
         reUploadMain.stop().animate({
                 right: '35px'
-            },
-            0);
+            },0);
     }
 
-    function showImg(){
+    function showImg() {
         tools.hide();
-        imgArea.show();
+        holderPane.show();
         reUploadMain.stop().animate({
                 right: '-35px'
             },
             300);
     }
 
-    function showError(msg){
+    function showError(msg) {
         msg = msg || '上传失败';
         tools.hide();
         errorPanel.find('.loadingText>b').text(msg);
         errorPanel.show();
     }
 
-    function checkSubmt(){
-        if (!jcrop_api){
+    function checkSubmit() {
+        if (!jcrop_api) {
             return false;
         }
         var hasChecked = true;
-        workForm.find('input[type=text]').each( function(index, val) {
-             if ($(this).val().trim().length==0){
+        workForm.find('input[type=text]').each(function () {
+            if ($(this).val().trim().length == 0) {
                 hasChecked = false;
-             }
+            }
         });
-        if (hasChecked){
+        if (hasChecked) {
             saveBtn.attr('disabled', false);
-        }else{
+        } else {
             saveBtn.attr('disabled', true);
         }
     }
 
-    function getCropInfo(){
-        var info = jcrop_api.tellSelect();
-        var bigImg = previewPane.find('img');
-        var thumbnailVal = bigImg.width()/originWidth;
-        var offsetLeft = Math.abs(parseInt(bigImg.css('margin-left')))*2;
-        var offsetTop = Math.abs(parseInt(bigImg.css('margin-top')))*2;
-        return '?imageMogr2/thumbnail/!'+(thumbnailVal*200).toFixed(2)+'p/crop/!'+minTargetWidth*2+'x'+minTargetHeight*2+'a'+offsetLeft+'a'+offsetTop;
-    }
-
-    function submitForm(e){
+    function submitForm(e) {
         e.preventDefault();
-        var file =  uploadIpt[0].files[0];
-        var bigImg = previewPane.find('img');
-        var offsetLeft = Math.abs(parseInt(bigImg.css('margin-left')))*2;
-        var offsetTop = Math.abs(parseInt(bigImg.css('margin-top')))*2;
+        var file = selFile.file;
+        var offsetLeft = Math.abs(parseInt(previewImg.css('margin-left'))) * combineRatio;
+        var offsetTop = Math.abs(parseInt(previewImg.css('margin-top'))) * combineRatio;
 
         //submit to server
-          var formData = new FormData();
-          formData.append('zhname', $("#inputZhName").val());
-          formData.append('enname', $("#inputEnName").val());
-          formData.append('department', $("#inputDepartment").val());
-          formData.append('imgSize', bigImg.width()*2 + 'x' + bigImg.height()*2);
-          formData.append('imgCrop', minTargetWidth*2+'x'+minTargetHeight*2+'+'+offsetLeft+'+'+offsetTop);
-          formData.append(file.name, file);
-          //formData.append('fileName', fileName);
+        var formData = new FormData();
+        formData.append('zhname', $("#inputZhName").val());
+        formData.append('enname', $("#inputEnName").val());
+        formData.append('department', $("#inputDepartment").val());
+        formData.append('imgSize', previewImg.width() * combineRatio + 'x' + previewImg.height() * combineRatio);
+        formData.append('imgCrop', previewWidth * combineRatio + 'x' + previewHeight * combineRatio + '+' + offsetLeft + '+' + offsetTop);
+        formData.append(file.name, file);
 
-          var postServerXhr = new XMLHttpRequest();
-          postServerXhr.open('POST', '/api/upload', true);
-          postServerXhr.onload = function(e) {
+        var postServerXhr = new XMLHttpRequest();
+        postServerXhr.open('POST', '/api/upload', true);
+        postServerXhr.onload = function () {
 
             var url = JSON.parse(this.response).data;
 
-            showProgress('正在加载合生图片', '90%');
-            var combinImg = new Image();
-            combinImg.onload = function(){
+            showProgress('正在合生图片', '60%');
+            var combineImgObj = new Image();
+            combineImgObj.onload = function () {
                 showProgress('工牌制作完成', '100%');
-                setTimeout(function(){
+                setTimeout(function () {
                     showCombinImg(url);
                 }, 500);
             };
-            combinImg.src = url;
-          };
+            combineImgObj.src = url;
+        };
 
-          postServerXhr.send(formData);
+        postServerXhr.send(formData);
 
-          showProgress('正在合生工作牌', '70%');
+        showProgress('正在合生工作牌', '70%');
 
     }
 
-    function showCombinImg(url){
+    function showCombinImg(url) {
+        url = url+'?'+new Date().getTime();
         progressWrap.hide();
-        combinImg.children('img')[0].src=url;
-        combinImg.show();
-        combinImg.find('.viewImg').attr('href', url);
+        combineImg.children('img')[0].src = url;
+        combineImg.show();
+        combineImg.find('.viewImg').attr('href', url);
     }
 
-    function completeMake(){
-        combinImg.hide();
+    function completeMake() {
+        combineImg.hide();
         mask.hide();
     }
 
-    function reMark(){
-        combinImg.hide();
+    function reMark() {
+        combineImg.hide();
         mask.hide();
-        reUpload();
+        showUpload();
     }
 
-    combinImg.find('.complete').bind('click', completeMake);
+    uploadIpt.bind('change', checkSelImg);
 
-    combinImg.find('.redo').bind('click', reMark);
+    combineImg.find('.complete').bind('click', completeMake);
+
+    combineImg.find('.redo').bind('click', reMark);
 
     saveBtn.bind('click', submitForm);
 
-    reloadBtn.bind('click', function(){
-        reUpload();
-    });
+    reloadBtn.bind('click', showUpload);
 
-    workForm.find('input[type=text]').each(function(){
+    workForm.find('input[type=text]').each(function () {
         var root = $(this);
         var target = $(this).attr('data-target');
-        root.keydown(function(event) {
-            setTimeout(function(){
-                if (root.val().trim().length==0){
-                    $('#'+target).text(root.attr('placeholder'));
-                }else{
-                    $('#'+target).text(root.val());
+        root.keydown(function (event) {
+            setTimeout(function () {
+                if (root.val().trim().length == 0) {
+                    $('#' + target).text(root.attr('placeholder'));
+                } else {
+                    $('#' + target).text(root.val());
                 }
-                checkSubmt();
+                checkSubmit();
             }, 0);
         });
     });
 
-    workForm.find('select').change(function(){
+    workForm.find('select').change(function () {
         var root = $(this);
-        var target = $(this).attr('data-target');
+        var target = $('#' + $(this).attr('data-target'));
         var colorCls = $(this).find("option:selected").attr('data-color');
-        $('#'+target)[0].className = '';
-        $('#'+target).text(root.val()).addClass(colorCls);
+        target[0].className = '';
+        target.text(root.val()).addClass(colorCls);
     })
 
-    //initJcrop();
 });
