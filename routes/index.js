@@ -141,7 +141,7 @@ router.post('/api/upload', multipartMiddleware, function(req, res, next) {
 
     for(var filename in files){
         var file = files[filename]
-        return combineImg(file.path, filename, combineMeta, function(src){
+        return combineImg(file.path, enname+'-'+zhname+'.jpg', combineMeta, function(src){
             resMsg.data = src;
             return res.json(resMsg);
         })

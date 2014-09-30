@@ -88,8 +88,8 @@ $(function () {
             }
             setTimeout(function(){
                 initJcrop();
+                checkSubmit();
             },0);
-            checkSubmit();
         };
         img.onerror = function () {
             showError();
