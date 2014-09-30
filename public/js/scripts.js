@@ -158,6 +158,7 @@ $(function () {
     function showUpload() {
         tools.hide();
         camera.show();
+        uploadIpt[0].value = '';
         reUploadMain.stop().animate({
                 right: '35px'
             },0);
