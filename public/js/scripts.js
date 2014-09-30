@@ -267,16 +267,35 @@ $(function () {
     workForm.find('input[type=text]').each(function () {
         var root = $(this);
         var target = $(this).attr('data-target');
-        root.keydown(function (event) {
+        root.keydown(function(e){
+
+            //控制只能输入英文，不能输入标点,在按下时就控制(没法控制中文)
+            //if (e.keyCode==110){
+            //    console.log('.');
+            //    return false;
+            //}
+
+            //等待输入法完成
             setTimeout(function () {
-                if (root.val().trim().length == 0) {
+                //控制不能输入中文
+                //var val = root[0].value;
+                //root[0].value= val.replace(/[^a-zA-Z]/g,'');
+
+                //值为空时，回到占位符
+                if (root.val().length == 0) {
                     $('#' + target).text(root.attr('placeholder'));
                 } else {
+                    //响应求值
                     $('#' + target).text(root.val());
                 }
+
                 checkSubmit();
-            }, 0);
+
+            },50);
+
+
         });
+
     });
 
     workForm.find('select').change(function () {
