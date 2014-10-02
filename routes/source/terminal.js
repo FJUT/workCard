@@ -1,8 +1,6 @@
-//var fs = require('fs');
-//var gm = require('gm');
-var teacher = 'C:\\Users\\user\\AppData\\Local\\Temp\\7956-tdh8jm.jpg';
-var logo = 'logo.png';
-var dest = "dest.jpg";
+var teacher = '/var/folders/3f/gd1_2h557290yk2651zlmwmc0000gn/T/81727-1wmf22m.jpg';
+var logo = 'routes/source/logo.png';
+var dest = "public/upload/sdfasdf-asdfasdf.jpg";
 
 var spawn = require('child_process').spawn;
 
@@ -11,9 +9,9 @@ var crop = spawn('convert',
       '-density',
       '300x300', //定义DPI
       '-resize',
-      '680x1032', //放大后尺寸
+      '762x1114', //放大后尺寸
       '-crop',
-      '548x870+124+0', //截图坐标
+      '548x870+146+0', //截图坐标
       '-quality',
       '100', //定义输出质量
       '+profile',
@@ -30,7 +28,7 @@ crop.on('exit',function(code){
       var addText = spawn('convert',
         [
             '-font',
-            'NexaLight', //定义字体
+            'routes/source/consola.ttf', //定义字体
             '-fill',
             'rgba(0,0,0,0.75)', //定义画笔颜色
             '-draw',
@@ -42,7 +40,7 @@ crop.on('exit',function(code){
             '-draw',
             "text 80,810 'King'", //写文字
             '-font',
-            'AdobeHeitiStd-Regular.otf', //定义字体
+            'routes/source/AdobeHeitiStd-Regular.otf', //定义字体
             '-draw',
             "text 80,855 'cpjmj'" , //写文字
             '-fill',

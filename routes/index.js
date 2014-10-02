@@ -11,9 +11,7 @@ var imgFolder = 'public/upload/';
 * 合成图片
 * */
 function combineImg(src, filename, combineMeta,  cb){
-
     var dest = imgFolder+filename;
-    //第一步：按大小截图
     var crop = spawn('convert', [
         '-density',
         '300x300', //定义DPI
@@ -23,26 +21,32 @@ function combineImg(src, filename, combineMeta,  cb){
         combineMeta.crop, //截图坐标
         '-quality',
         '100', //定义输出质量
-        '+profile',
-        '*', //去除EXT信息
+        //'+profile', //mac上会报错，暂关闭此项
+        //'*', //去除EXT信息
         src,
         dest
     ]);
 
-    crop.on('error', function (err) {
-        console.log('gm crop error', err);
+    // 捕获标准输出并将其打印到控制台
+    crop.stdout.on('data', function (data) {
+        console.log('标准输出：\n' + data);
     });
+
+    // 捕获标准错误输出并将其打印到控制台
+    crop.stderr.on('data', function (data) {
+        console.log('标准错误输出：\n' + data);
+    });
+
 
     crop.on('exit',function(code) {
         if (code != 0) {
             console.log('gm crop process exited with code ' + code);
         } else {
-
             //第二步：添加文字信息
             var addText = spawn('convert',
                 [
                     '-font',
-                    'NexaLight', //定义字体
+                    'routes/source/NexaLight.otf', //定义字体
                     '-fill',
                     'rgba(0,0,0,0.75)', //定义画笔颜色
                     '-draw',
