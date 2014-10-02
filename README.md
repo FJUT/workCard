@@ -137,4 +137,4 @@
 
 
 ##相关文章
-javascript控制表单输入: [http://webfing.github.com/control-form-input](http://webfing.github.com/control-form-input)
+javascript控制表单输入: [http://webfing.github.com/javascript-control-form-input](http://webfing.github.com/javascript-control-form-input)
